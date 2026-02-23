@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -25,11 +24,70 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            'company_name' => fake()->company(),
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'subscription_plan' => 'free',
+            'subscription_status' => 'active',
+            'subscription_id' => null,
+            'role' => 'user',
+            'status' => 'active',
         ];
+    }
+
+    /**
+     * Indicate user is Pro plan subscriber.
+     */
+    public function proPlan(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'subscription_plan' => 'pro',
+                'subscription_status' => 'active',
+                'subscription_id' => 'sub_' . fake()->unique()->numberBetween(1000000, 9999999),
+            ];
+        });
+    }
+
+    /**
+     * Indicate user is trialing Pro plan.
+     */
+    public function trialPlan(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'subscription_plan' => 'pro',
+                'subscription_status' => 'trialing',
+                'subscription_id' => 'sub_trial_' . fake()->unique()->numberBetween(1000000, 9999999),
+            ];
+        });
+    }
+
+    /**
+     * Indicate user is superadmin.
+     */
+    public function superadmin(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'email' => 'superadmin@ria-sas.local',
+                'name' => 'SuperAdmin',
+                'company_name' => 'RIA-SAS',
+                'role' => 'superadmin',
+            ];
+        });
+    }
+
+    /**
+     * Indicate user is admin.
+     */
+    public function admin(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'role' => 'admin',
+            ];
+        });
     }
 
     /**
@@ -37,8 +95,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return $this;
     }
 }
+

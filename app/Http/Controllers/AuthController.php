@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ForgotPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -17,16 +22,18 @@ class AuthController extends Controller
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::create([
-            'name' => $request->validated('name'),
+            'name' => $request->validated('name') ?? $request->validated('company_name'),
+            'company_name' => $request->validated('company_name'),
             'email' => $request->validated('email'),
             'password' => Hash::make($request->validated('password')),
-            'plan_type' => 'free',
+            'subscription_plan' => 'free',
+            'subscription_status' => 'active',
         ]);
 
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => $this->formatUserResponse($user),
             'token' => $token,
         ], 201);
     }
@@ -47,28 +54,148 @@ class AuthController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => $this->formatUserResponse($user),
             'token' => $token,
         ]);
     }
 
     /**
-     * Get the authenticated user.
+     * Request a password reset token.
      */
-    public function me(Request $request): JsonResponse
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
-        return response()->json($request->user());
+        $user = User::where('email', $request->validated('email'))->first();
+
+        if ($user) {
+            $token = Str::random(64);
+
+            DB::table('password_reset_tokens')
+                ->where('user_id', $user->id)
+                ->delete();
+
+            DB::table('password_reset_tokens')->insert([
+                'user_id' => $user->id,
+                'token' => $token,
+                'expires_at' => now()->addHour(),
+                'created_at' => now(),
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Password reset email sent successfully',
+        ]);
     }
 
     /**
-     * Logout the user.
+     * Reset the user's password using a token.
      */
-    public function logout(Request $request): JsonResponse
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $tokenRow = DB::table('password_reset_tokens')
+            ->where('token', $request->validated('token'))
+            ->whereNull('used_at')
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (!$tokenRow) {
+            return response()->json([
+                'error' => 'Invalid or expired token',
+            ], 400);
+        }
+
+        $user = User::find($tokenRow->user_id);
+        if (!$user) {
+            return response()->json([
+                'error' => 'Invalid or expired token',
+            ], 400);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->validated('password')),
+        ]);
+
+        DB::table('password_reset_tokens')
+            ->where('id', $tokenRow->id)
+            ->update(['used_at' => now()]);
 
         return response()->json([
-            'message' => 'Logged out successfully',
+            'message' => 'Password reset successfully',
         ]);
+    }
+
+    /**
+     * Get the authenticated user profile.
+     */
+    public function user(Request $request): JsonResponse
+    {
+        return response()->json($this->formatUserResponse($request->user()));
+    }
+
+    /**
+     * Update the authenticated user profile.
+     */
+    public function updateProfile(UpdateProfileRequest $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if ($request->filled('new_password')) {
+            if (!$request->filled('current_password') || !Hash::check($request->validated('current_password'), $user->password)) {
+                return response()->json([
+                    'error' => 'Current password is incorrect',
+                ], 400);
+            }
+
+            $user->password = Hash::make($request->validated('new_password'));
+        }
+
+        if ($request->filled('email')) {
+            $user->email = $request->validated('email');
+        }
+
+        if ($request->filled('company_name')) {
+            $user->company_name = $request->validated('company_name');
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user' => $this->formatUserResponse($user),
+        ]);
+    }
+
+    /**
+     * Delete the authenticated user account.
+     */
+    public function deleteAccount(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $user->tokens()->delete();
+        $user->delete();
+
+        return response()->json([
+            'message' => 'Account deleted successfully',
+        ]);
+    }
+
+    /**
+     * Format user response payload with usage info.
+     */
+    private function formatUserResponse(User $user): array
+    {
+        return [
+            'id' => $user->id,
+            'email' => $user->email,
+            'company_name' => $user->company_name,
+            'created_at' => $user->created_at,
+            'subscription_plan' => $user->subscription_plan,
+            'subscription_status' => $user->subscription_status,
+            'subscription_id' => $user->subscription_id,
+            'usage' => [
+                'invoices_count' => $user->invoices()->count(),
+                'clients_count' => $user->clients()->count(),
+                'storage_used_mb' => 0,
+            ],
+        ];
     }
 }

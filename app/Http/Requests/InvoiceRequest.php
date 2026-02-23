@@ -23,10 +23,14 @@ class InvoiceRequest extends FormRequest
     {
         return [
             'client_id' => 'required|exists:clients,id',
-            'issued_at' => 'required|date',
-            'due_date' => 'nullable|date|after_or_equal:issued_at',
+            'issue_date' => 'required|date',
+            'due_date' => 'nullable|date|after_or_equal:issue_date',
+            'status' => 'nullable|in:draft,sent,paid,unpaid',
+            'tax_rate' => 'nullable|numeric|min:0|max:100',
+            'notes' => 'nullable|string',
+            'watermark' => 'nullable|array',
             'items' => 'required|array|min:1',
-            'items.*.service_name' => 'required|string|max:255',
+            'items.*.description' => 'required|string|max:255',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.unit_price' => 'required|numeric|min:0|decimal:0,2',
         ];

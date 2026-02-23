@@ -4,11 +4,12 @@ namespace App\Providers;
 
 use App\Models\Client;
 use App\Models\Invoice;
-use App\Models\Service;
 use App\Policies\ClientPolicy;
 use App\Policies\InvoicePolicy;
-use App\Policies\ServicePolicy;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -27,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerPolicies();
+        $this->registerRateLimiters();
     }
 
     /**
@@ -35,8 +37,19 @@ class AppServiceProvider extends ServiceProvider
     protected function registerPolicies(): void
     {
         Gate::policy(Client::class, ClientPolicy::class);
-        Gate::policy(Service::class, ServicePolicy::class);
         Gate::policy(Invoice::class, InvoicePolicy::class);
+    }
+
+    /**
+     * Register rate limiters.
+     */
+    protected function registerRateLimiters(): void
+    {
+        RateLimiter::for('api', function (Request $request) {
+            $userId = $request->user()?->id;
+
+            return Limit::perMinute(60)->by($userId ?: $request->ip());
+        });
     }
 }
 

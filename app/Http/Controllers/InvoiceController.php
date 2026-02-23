@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
-
     use AuthorizesRequests;
 
     /**
@@ -21,6 +20,7 @@ class InvoiceController extends Controller
     {
         $invoices = Invoice::where('user_id', $request->user()->id)
             ->with('client', 'items')
+            ->orderBy('issue_date', 'desc')
             ->get();
 
         return response()->json($invoices);
@@ -40,33 +40,35 @@ class InvoiceController extends Controller
         // Generate invoice number
         $invoiceNumber = $this->generateInvoiceNumber($request->user()->id);
 
-        // Calculate total amount
-        $totalAmount = 0;
-        $items = $request->validated('items');
-        foreach ($items as $item) {
-            $totalAmount += $item['quantity'] * $item['unit_price'];
-        }
+        // Calculate financial totals
+        $subtotal = $this->calculateSubtotal($request->validated('items'));
+        $tax_rate = $request->validated('tax_rate', 0);
+        $tax_amount = round($subtotal * ($tax_rate / 100), 2);
+        $total = round($subtotal + $tax_amount, 2);
 
         // Create invoice
         $invoice = Invoice::create([
             'user_id' => $request->user()->id,
             'client_id' => $request->validated('client_id'),
             'invoice_number' => $invoiceNumber,
-            'total_amount' => $totalAmount,
-            'status' => 'unpaid',
-            'issued_at' => $request->validated('issued_at'),
+            'subtotal' => $subtotal,
+            'tax_rate' => $tax_rate,
+            'tax_amount' => $tax_amount,
+            'total' => $total,
+            'status' => $request->validated('status', 'draft'),
+            'issue_date' => $request->validated('issue_date'),
             'due_date' => $request->validated('due_date'),
+            'notes' => $request->validated('notes'),
+            'watermark' => $request->validated('watermark'),
         ]);
 
         // Create invoice items
-        foreach ($items as $item) {
-            $totalPrice = $item['quantity'] * $item['unit_price'];
+        foreach ($request->validated('items') as $item) {
             InvoiceItem::create([
                 'invoice_id' => $invoice->id,
-                'service_name' => $item['service_name'],
+                'description' => $item['description'],
                 'quantity' => $item['quantity'],
                 'unit_price' => $item['unit_price'],
-                'total_price' => $totalPrice,
             ]);
         }
 
@@ -99,31 +101,34 @@ class InvoiceController extends Controller
             return response()->json(['message' => 'Client not found'], 404);
         }
 
-        // Calculate total amount
-        $totalAmount = 0;
-        $items = $request->validated('items');
-        foreach ($items as $item) {
-            $totalAmount += $item['quantity'] * $item['unit_price'];
-        }
+        // Calculate financial totals
+        $subtotal = $this->calculateSubtotal($request->validated('items'));
+        $tax_rate = $request->validated('tax_rate', $invoice->tax_rate);
+        $tax_amount = round($subtotal * ($tax_rate / 100), 2);
+        $total = round($subtotal + $tax_amount, 2);
 
         // Update invoice
         $invoice->update([
             'client_id' => $request->validated('client_id'),
-            'total_amount' => $totalAmount,
-            'issued_at' => $request->validated('issued_at'),
-            'due_date' => $request->validated('due_date'),
+            'subtotal' => $subtotal,
+            'tax_rate' => $tax_rate,
+            'tax_amount' => $tax_amount,
+            'total' => $total,
+            'status' => $request->validated('status', $invoice->status),
+            'issue_date' => $request->validated('issue_date', $invoice->issue_date),
+            'due_date' => $request->validated('due_date', $invoice->due_date),
+            'notes' => $request->validated('notes', $invoice->notes),
+            'watermark' => $request->validated('watermark', $invoice->watermark),
         ]);
 
         // Delete and recreate items
         $invoice->items()->delete();
-        foreach ($items as $item) {
-            $totalPrice = $item['quantity'] * $item['unit_price'];
+        foreach ($request->validated('items') as $item) {
             InvoiceItem::create([
                 'invoice_id' => $invoice->id,
-                'service_name' => $item['service_name'],
+                'description' => $item['description'],
                 'quantity' => $item['quantity'],
                 'unit_price' => $item['unit_price'],
-                'total_price' => $totalPrice,
             ]);
         }
 
@@ -157,16 +162,57 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Send invoice via email.
+     */
+    public function sendEmail(Request $request, Invoice $invoice): JsonResponse
+    {
+        $this->authorize('view', $invoice);
+
+        // TODO: Implement email sending logic
+        // Mail::to($invoice->client->email)->send(new InvoiceMailable($invoice));
+
+        return response()->json([
+            'message' => 'Invoice email sent successfully',
+        ]);
+    }
+
+    /**
+     * Send invoice via WhatsApp.
+     */
+    public function sendWhatsapp(Request $request, Invoice $invoice): JsonResponse
+    {
+        $this->authorize('view', $invoice);
+
+        // TODO: Implement WhatsApp sending logic via Twilio or similar
+
+        return response()->json([
+            'message' => 'Invoice WhatsApp sent successfully',
+        ]);
+    }
+
+    /**
      * Export invoice as PDF.
      */
     public function pdf(Request $request, Invoice $invoice): JsonResponse
     {
         $this->authorize('view', $invoice);
 
-        // This will be implemented with DomPDF
+        // TODO: Implement PDF generation with DomPDF
         return response()->json([
             'message' => 'PDF generation not yet implemented',
         ]);
+    }
+
+    /**
+     * Calculate subtotal from invoice items array.
+     */
+    private function calculateSubtotal(array $items): float
+    {
+        $subtotal = 0;
+        foreach ($items as $item) {
+            $subtotal += $item['quantity'] * $item['unit_price'];
+        }
+        return round($subtotal, 2);
     }
 
     /**

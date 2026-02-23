@@ -15,16 +15,27 @@ class Invoice extends Model
         'user_id',
         'client_id',
         'invoice_number',
-        'total_amount',
+        'subtotal',
+        'tax_rate',
+        'tax_amount',
+        'total',
         'status',
-        'issued_at',
+        'issue_date',
         'due_date',
+        'paid_date',
+        'notes',
+        'watermark',
     ];
 
     protected $casts = [
-        'total_amount' => 'decimal:2',
-        'issued_at' => 'date',
+        'subtotal' => 'decimal:2',
+        'tax_rate' => 'decimal:2',
+        'tax_amount' => 'decimal:2',
+        'total' => 'decimal:2',
+        'issue_date' => 'date',
         'due_date' => 'date',
+        'paid_date' => 'date',
+        'watermark' => 'array',
     ];
 
     /**
@@ -56,7 +67,10 @@ class Invoice extends Model
      */
     public function markAsPaid(): void
     {
-        $this->update(['status' => 'paid']);
+        $this->update([
+            'status' => 'paid',
+            'paid_date' => now()->toDateString(),
+        ]);
     }
 
     /**

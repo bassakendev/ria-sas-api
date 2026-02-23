@@ -1,0 +1,1804 @@
+openapi: 3.0.3
+info:
+  title: 'Laravel API Documentation'
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8000'
+tags:
+  -
+    name: Endpoints
+    description: ''
+paths:
+  /api/auth/login:
+    post:
+      summary: 'Login a user.'
+      operationId: loginAUser
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'Must be a valid email address.'
+                  example: gbailey@example.net
+                password:
+                  type: string
+                  description: 'Must be at least 8 characters.'
+                  example: '+-0pBNvYgxwmi/#iw'
+              required:
+                - email
+                - password
+      security: []
+  /api/auth/register:
+    post:
+      summary: 'Register a new user.'
+      operationId: registerANewUser
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: b
+                  nullable: true
+                company_name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: 'n'
+                email:
+                  type: string
+                  description: 'Must be a valid email address.'
+                  example: ashly64@example.com
+                password:
+                  type: string
+                  description: 'Must be at least 8 characters.'
+                  example: pBNvYg
+              required:
+                - company_name
+                - email
+                - password
+      security: []
+  /api/auth/forgot-password:
+    post:
+      summary: 'Request a password reset token.'
+      operationId: requestAPasswordResetToken
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'Must be a valid email address.'
+                  example: gbailey@example.net
+              required:
+                - email
+      security: []
+  /api/auth/reset-password:
+    post:
+      summary: "Reset the user's password using a token."
+      operationId: resetTheUsersPasswordUsingAToken
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: ''
+                  example: architecto
+                password:
+                  type: string
+                  description: 'Must be at least 8 characters.'
+                  example: ']|{+-0pBNvYg'
+              required:
+                - token
+                - password
+      security: []
+  /api/subscription/plans:
+    get:
+      summary: 'Get available subscription plans (public).'
+      operationId: getAvailableSubscriptionPlanspublic
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: free
+                    name:
+                      type: string
+                      example: 'Plan Gratuit'
+                    price:
+                      type: integer
+                      example: 0
+                    currency:
+                      type: string
+                      example: €
+                    interval:
+                      type: string
+                      example: month
+                    features:
+                      type: array
+                      example:
+                        - "Jusqu'à 5 factures par mois"
+                        - 'Gestion de 3 clients maximum'
+                        - 'Stockage de 100 MB'
+                        - 'Support par email'
+                      items:
+                        type: string
+                    limits:
+                      type: object
+                      properties:
+                        invoicesPerMonth:
+                          type: integer
+                          example: 5
+                        clients:
+                          type: integer
+                          example: 3
+                        storage:
+                          type: string
+                          example: '100 MB'
+                        support:
+                          type: string
+                          example: 'Email (48h)'
+                example:
+                  -
+                    id: free
+                    name: 'Plan Gratuit'
+                    price: 0
+                    currency: €
+                    interval: month
+                    features:
+                      - "Jusqu'à 5 factures par mois"
+                      - 'Gestion de 3 clients maximum'
+                      - 'Stockage de 100 MB'
+                      - 'Support par email'
+                    limits:
+                      invoicesPerMonth: 5
+                      clients: 3
+                      storage: '100 MB'
+                      support: 'Email (48h)'
+                  -
+                    id: pro
+                    name: 'Plan Pro'
+                    price: 12
+                    currency: €
+                    interval: month
+                    features:
+                      - 'Factures illimitées'
+                      - 'Clients illimités'
+                      - 'Stockage de 10 GB'
+                      - 'Support prioritaire'
+                      - 'Export CSV avancé'
+                      - 'Personnalisation des factures'
+                      - 'Filigrane personnalisé'
+                      - 'Rapports et statistiques avancés'
+                    limits:
+                      invoicesPerMonth: -1
+                      clients: -1
+                      storage: '10 GB'
+                      support: 'Email & Chat (2h)'
+      tags:
+        - Endpoints
+      security: []
+  /api/user:
+    get:
+      summary: 'Get the authenticated user profile.'
+      operationId: getTheAuthenticatedUserProfile
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/user/profile:
+    put:
+      summary: 'Update the authenticated user profile.'
+      operationId: updateTheAuthenticatedUserProfile
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'Must be a valid email address.'
+                  example: gbailey@example.net
+                  nullable: true
+                company_name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: m
+                  nullable: true
+                current_password:
+                  type: string
+                  description: 'Must be at least 8 characters.'
+                  example: iyvdljnikhwaykcmyuwpwlvqwr
+                  nullable: true
+                new_password:
+                  type: string
+                  description: 'Must be at least 8 characters.'
+                  example: sitcpscqldzsnrwtujwvlxjklq
+                  nullable: true
+      security: []
+  /api/user/account:
+    delete:
+      summary: 'Delete the authenticated user account.'
+      operationId: deleteTheAuthenticatedUserAccount
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/clients:
+    get:
+      summary: 'Display a listing of clients for the authenticated user.'
+      operationId: displayAListingOfClientsForTheAuthenticatedUser
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Store a newly created client.'
+      operationId: storeANewlyCreatedClient
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: b
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
+                  example: zbailey@example.net
+                  nullable: true
+                phone:
+                  type: string
+                  description: 'Must not be greater than 20 characters.'
+                  example: iyvdljnikhwaykcm
+                  nullable: true
+                address:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: 'y'
+                  nullable: true
+                city:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: u
+                  nullable: true
+                postal_code:
+                  type: string
+                  description: 'Must not be greater than 20 characters.'
+                  example: wpwlvqwrsitcpscq
+                  nullable: true
+                country:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: l
+                  nullable: true
+              required:
+                - name
+      security: []
+  '/api/clients/{id}':
+    get:
+      summary: 'Display the specified client.'
+      operationId: displayTheSpecifiedClient
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update the specified client.'
+      operationId: updateTheSpecifiedClient
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: b
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
+                  example: zbailey@example.net
+                  nullable: true
+                phone:
+                  type: string
+                  description: 'Must not be greater than 20 characters.'
+                  example: iyvdljnikhwaykcm
+                  nullable: true
+                address:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: 'y'
+                  nullable: true
+                city:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: u
+                  nullable: true
+                postal_code:
+                  type: string
+                  description: 'Must not be greater than 20 characters.'
+                  example: wpwlvqwrsitcpscq
+                  nullable: true
+                country:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: l
+                  nullable: true
+              required:
+                - name
+      security: []
+    delete:
+      summary: 'Remove the specified client.'
+      operationId: removeTheSpecifiedClient
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the client.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/invoices:
+    get:
+      summary: 'Display a listing of invoices for the authenticated user.'
+      operationId: displayAListingOfInvoicesForTheAuthenticatedUser
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Store a newly created invoice.'
+      operationId: storeANewlyCreatedInvoice
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the clients table.'
+                  example: architecto
+                issue_date:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-02-23T16:23:57'
+                due_date:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after or equal to <code>issue_date</code>.'
+                  example: '2052-03-18'
+                  nullable: true
+                status:
+                  type: string
+                  description: ''
+                  example: paid
+                  enum:
+                    - draft
+                    - sent
+                    - paid
+                    - unpaid
+                  nullable: true
+                tax_rate:
+                  type: number
+                  description: 'Must be at least 0. Must not be greater than 100.'
+                  example: 22
+                  nullable: true
+                notes:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                watermark:
+                  type: object
+                  description: ''
+                  example: null
+                  properties: {  }
+                  nullable: true
+                items:
+                  type: array
+                  description: 'Must have at least 1 items.'
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      description:
+                        type: string
+                        description: 'Must not be greater than 255 characters.'
+                        example: 'Eius et animi quos velit et.'
+                      quantity:
+                        type: integer
+                        description: 'Must be at least 1.'
+                        example: 16
+                      unit_price:
+                        type: number
+                        description: 'Must be at least 0.'
+                        example: 42
+                    required:
+                      - description
+                      - quantity
+                      - unit_price
+              required:
+                - client_id
+                - issue_date
+                - items
+      security: []
+  '/api/invoices/{id}':
+    get:
+      summary: 'Display the specified invoice.'
+      operationId: displayTheSpecifiedInvoice
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Update the specified invoice.'
+      operationId: updateTheSpecifiedInvoice
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: string
+                  description: 'The <code>id</code> of an existing record in the clients table.'
+                  example: architecto
+                issue_date:
+                  type: string
+                  description: 'Must be a valid date.'
+                  example: '2026-02-23T16:23:57'
+                due_date:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after or equal to <code>issue_date</code>.'
+                  example: '2052-03-18'
+                  nullable: true
+                status:
+                  type: string
+                  description: ''
+                  example: paid
+                  enum:
+                    - draft
+                    - sent
+                    - paid
+                    - unpaid
+                  nullable: true
+                tax_rate:
+                  type: number
+                  description: 'Must be at least 0. Must not be greater than 100.'
+                  example: 22
+                  nullable: true
+                notes:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                watermark:
+                  type: object
+                  description: ''
+                  example: null
+                  properties: {  }
+                  nullable: true
+                items:
+                  type: array
+                  description: 'Must have at least 1 items.'
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      description:
+                        type: string
+                        description: 'Must not be greater than 255 characters.'
+                        example: 'Eius et animi quos velit et.'
+                      quantity:
+                        type: integer
+                        description: 'Must be at least 1.'
+                        example: 16
+                      unit_price:
+                        type: number
+                        description: 'Must be at least 0.'
+                        example: 42
+                    required:
+                      - description
+                      - quantity
+                      - unit_price
+              required:
+                - client_id
+                - issue_date
+                - items
+      security: []
+    delete:
+      summary: 'Remove the specified invoice.'
+      operationId: removeTheSpecifiedInvoice
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the invoice.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/invoices/{invoice_id}/mark-paid':
+    patch:
+      summary: 'Mark the invoice as paid.'
+      operationId: markTheInvoiceAsPaid
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: invoice_id
+        description: 'The ID of the invoice.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/invoices/{invoice_id}/pdf':
+    get:
+      summary: 'Export invoice as PDF.'
+      operationId: exportInvoiceAsPDF
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: invoice_id
+        description: 'The ID of the invoice.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/invoices/export:
+    get:
+      summary: 'Export invoices as CSV.'
+      operationId: exportInvoicesAsCSV
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/clients/export:
+    get:
+      summary: 'Export clients as CSV.'
+      operationId: exportClientsAsCSV
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/invoices/{invoice_id}/send-email':
+    post:
+      summary: 'Send invoice via email.'
+      operationId: sendInvoiceViaEmail
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: invoice_id
+        description: 'The ID of the invoice.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/invoices/{invoice_id}/send-whatsapp':
+    post:
+      summary: 'Send invoice via WhatsApp.'
+      operationId: sendInvoiceViaWhatsApp
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: invoice_id
+        description: 'The ID of the invoice.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/feedback:
+    post:
+      summary: 'Create feedback for the authenticated user.'
+      operationId: createFeedbackForTheAuthenticatedUser
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: ''
+                  example: other
+                  enum:
+                    - question
+                    - bug
+                    - feature
+                    - other
+                email:
+                  type: string
+                  description: 'Must be a valid email address. Must not be greater than 255 characters.'
+                  example: gbailey@example.net
+                subject:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: m
+                message:
+                  type: string
+                  description: 'Must be at least 10 characters. Must not be greater than 5000 characters.'
+                  example: i
+              required:
+                - type
+                - email
+                - subject
+                - message
+      security: []
+    get:
+      summary: 'Get all feedback for the authenticated user (admin only).'
+      operationId: getAllFeedbackForTheAuthenticatedUseradminOnly
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/feedback/{feedback_id}':
+    get:
+      summary: 'Get feedback by ID.'
+      operationId: getFeedbackByID
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete feedback.'
+      operationId: deleteFeedback
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: feedback_id
+        description: 'The ID of the feedback.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/feedback/{feedback_id}/mark-read':
+    patch:
+      summary: 'Mark feedback as read.'
+      operationId: markFeedbackAsRead
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: feedback_id
+        description: 'The ID of the feedback.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/feedback/{feedback_id}/close':
+    patch:
+      summary: 'Close feedback.'
+      operationId: closeFeedback
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: feedback_id
+        description: 'The ID of the feedback.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/subscription:
+    get:
+      summary: "Get the current user's active subscription."
+      operationId: getTheCurrentUsersActiveSubscription
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/subscription/upgrade:
+    post:
+      summary: 'Upgrade to a new plan.'
+      operationId: upgradeToANewPlan
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planId:
+                  type: string
+                  description: ''
+                  example: free
+                  enum:
+                    - free
+                    - pro
+                  nullable: true
+                billingPeriod:
+                  type: string
+                  description: ''
+                  example: month
+                  enum:
+                    - month
+                    - year
+                  nullable: true
+                effectiveDate:
+                  type: string
+                  description: 'Must be a valid date in the format <code>Y-m-d</code>.'
+                  example: '2026-02-23'
+                  nullable: true
+                reason:
+                  type: string
+                  description: 'Must not be greater than 500 characters.'
+                  example: b
+                  nullable: true
+                feedback:
+                  type: string
+                  description: 'Must not be greater than 2000 characters.'
+                  example: 'n'
+                  nullable: true
+      security: []
+  /api/subscription/downgrade:
+    post:
+      summary: 'Downgrade to a new plan.'
+      operationId: downgradeToANewPlan
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planId:
+                  type: string
+                  description: ''
+                  example: free
+                  enum:
+                    - free
+                    - pro
+                  nullable: true
+                billingPeriod:
+                  type: string
+                  description: ''
+                  example: month
+                  enum:
+                    - month
+                    - year
+                  nullable: true
+                effectiveDate:
+                  type: string
+                  description: 'Must be a valid date in the format <code>Y-m-d</code>.'
+                  example: '2026-02-23'
+                  nullable: true
+                reason:
+                  type: string
+                  description: 'Must not be greater than 500 characters.'
+                  example: b
+                  nullable: true
+                feedback:
+                  type: string
+                  description: 'Must not be greater than 2000 characters.'
+                  example: 'n'
+                  nullable: true
+      security: []
+  /api/subscription/cancel:
+    post:
+      summary: 'Cancel the subscription.'
+      operationId: cancelTheSubscription
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planId:
+                  type: string
+                  description: ''
+                  example: pro
+                  enum:
+                    - free
+                    - pro
+                  nullable: true
+                billingPeriod:
+                  type: string
+                  description: ''
+                  example: month
+                  enum:
+                    - month
+                    - year
+                  nullable: true
+                effectiveDate:
+                  type: string
+                  description: 'Must be a valid date in the format <code>Y-m-d</code>.'
+                  example: '2026-02-23'
+                  nullable: true
+                reason:
+                  type: string
+                  description: 'Must not be greater than 500 characters.'
+                  example: b
+                  nullable: true
+                feedback:
+                  type: string
+                  description: 'Must not be greater than 2000 characters.'
+                  example: 'n'
+                  nullable: true
+      security: []
+  /api/subscription/reactivate:
+    post:
+      summary: 'Reactivate a canceled subscription.'
+      operationId: reactivateACanceledSubscription
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/subscription/invoices:
+    get:
+      summary: 'Get subscription billing invoices.'
+      operationId: getSubscriptionBillingInvoices
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/subscription/usage:
+    get:
+      summary: 'Get subscription usage statistics.'
+      operationId: getSubscriptionUsageStatistics
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/stripe/create-checkout-session:
+    post:
+      summary: 'Create a stripe checkout session.'
+      operationId: createAStripeCheckoutSession
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/admin/overview:
+    get:
+      summary: 'Get admin dashboard overview with KPIs.'
+      operationId: getAdminDashboardOverviewWithKPIs
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/admin/users:
+    get:
+      summary: 'List all users with pagination and filters.'
+      operationId: listAllUsersWithPaginationAndFilters
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/admin/users/{user_id}':
+    get:
+      summary: 'Get detailed user information.'
+      operationId: getDetailedUserInformation
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete a user permanently.'
+      operationId: deleteAUserPermanently
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: user_id
+        description: 'The ID of the user.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/admin/users/{user_id}/role':
+    patch:
+      summary: 'Change user role.'
+      operationId: changeUserRole
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  description: ''
+                  example: architecto
+              required:
+                - role
+      security: []
+    parameters:
+      -
+        in: path
+        name: user_id
+        description: 'The ID of the user.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/admin/users/{user_id}/suspend':
+    post:
+      summary: 'Suspend a user account.'
+      operationId: suspendAUserAccount
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: user_id
+        description: 'The ID of the user.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/admin/users/{user_id}/activate':
+    post:
+      summary: 'Activate a suspended user account.'
+      operationId: activateASuspendedUserAccount
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: user_id
+        description: 'The ID of the user.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/admin/users/{user_id}/assign-plan':
+    post:
+      summary: 'Assign a plan directly to a user (without payment).'
+      operationId: assignAPlanDirectlyToAUserwithoutPayment
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan:
+                  type: string
+                  description: ''
+                  example: architecto
+                reason:
+                  type: string
+                  description: 'Must not be greater than 500 characters.'
+                  example: 'n'
+                  nullable: true
+              required:
+                - plan
+      security: []
+    parameters:
+      -
+        in: path
+        name: user_id
+        description: 'The ID of the user.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/admin/subscriptions:
+    get:
+      summary: 'List all subscriptions with pagination and filters.'
+      operationId: listAllSubscriptionsWithPaginationAndFilters
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/admin/subscriptions/{subscription_id}/plan':
+    patch:
+      summary: 'Change the plan of an existing subscription.'
+      operationId: changeThePlanOfAnExistingSubscription
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan:
+                  type: string
+                  description: ''
+                  example: architecto
+              required:
+                - plan
+      security: []
+    parameters:
+      -
+        in: path
+        name: subscription_id
+        description: 'The ID of the subscription.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/admin/subscriptions/{subscription_id}/cancel':
+    post:
+      summary: 'Cancel a subscription.'
+      operationId: cancelASubscription
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 'Must not be greater than 500 characters.'
+                  example: b
+              required:
+                - reason
+      security: []
+    parameters:
+      -
+        in: path
+        name: subscription_id
+        description: 'The ID of the subscription.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/admin/feedbacks:
+    get:
+      summary: 'List all feedbacks with pagination and filters.'
+      operationId: listAllFeedbacksWithPaginationAndFilters
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/admin/feedbacks/{feedback_id}':
+    get:
+      summary: 'Get detailed feedback information.'
+      operationId: getDetailedFeedbackInformation
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete a feedback.'
+      operationId: deleteAFeedback
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: feedback_id
+        description: 'The ID of the feedback.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/admin/feedbacks/{feedback_id}/status':
+    patch:
+      summary: 'Change feedback status.'
+      operationId: changeFeedbackStatus
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  description: ''
+                  example: architecto
+              required:
+                - status
+      security: []
+    parameters:
+      -
+        in: path
+        name: feedback_id
+        description: 'The ID of the feedback.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/admin/feedbacks/{feedback_id}/response':
+    patch:
+      summary: 'Add or update response to feedback.'
+      operationId: addOrUpdateResponseToFeedback
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                response:
+                  type: string
+                  description: 'Must not be greater than 2000 characters.'
+                  example: b
+              required:
+                - response
+      security: []
+    parameters:
+      -
+        in: path
+        name: feedback_id
+        description: 'The ID of the feedback.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/admin/stats:
+    get:
+      summary: 'Get analytics statistics for a given period.'
+      operationId: getAnalyticsStatisticsForAGivenPeriod
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/admin/audit-logs:
+    get:
+      summary: 'List audit logs with pagination.'
+      operationId: listAuditLogsWithPagination
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/admin/settings:
+    get:
+      summary: 'Get all system settings.'
+      operationId: getAllSystemSettings
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    patch:
+      summary: 'Update system settings (partial update supported).'
+      operationId: updateSystemSettingspartialUpdateSupported
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                security:
+                  type: object
+                  description: ''
+                  example: null
+                  properties:
+                    mfaRequired:
+                      type: boolean
+                      description: ''
+                      example: true
+                      nullable: true
+                    passwordMinLength:
+                      type: integer
+                      description: 'Must be at least 8. Must not be greater than 32.'
+                      example: 1
+                      nullable: true
+                    tokenTtlMinutes:
+                      type: integer
+                      description: 'Must be at least 60. Must not be greater than 10080.'
+                      example: 22
+                      nullable: true
+                  nullable: true
+                access:
+                  type: object
+                  description: ''
+                  example: null
+                  properties:
+                    allowAdminImpersonation:
+                      type: boolean
+                      description: ''
+                      example: true
+                      nullable: true
+                    maxAdminSessions:
+                      type: integer
+                      description: 'Must be at least 1. Must not be greater than 10.'
+                      example: 7
+                      nullable: true
+                  nullable: true
+                billing:
+                  type: object
+                  description: ''
+                  example: null
+                  properties:
+                    prorationEnabled:
+                      type: boolean
+                      description: ''
+                      example: true
+                      nullable: true
+                    gracePeriodDays:
+                      type: integer
+                      description: 'Must be at least 0. Must not be greater than 30.'
+                      example: 16
+                      nullable: true
+                    defaultCurrency:
+                      type: string
+                      description: 'Must be 3 characters.'
+                      example: miy
+                      nullable: true
+                  nullable: true
+                notifications:
+                  type: object
+                  description: ''
+                  example: null
+                  properties:
+                    slaWarningHours:
+                      type: integer
+                      description: 'Must be at least 1. Must not be greater than 72.'
+                      example: 1
+                      nullable: true
+                    emailFrom:
+                      type: string
+                      description: 'Must be a valid email address.'
+                      example: jdach@example.org
+                      nullable: true
+                    webhookUrl:
+                      type: string
+                      description: 'Must be a valid URL.'
+                      example: 'https://www.runte.com/ab-provident-perspiciatis-quo-omnis-nostrum-aut-adipisci'
+                      nullable: true
+                  nullable: true
+                integrations:
+                  type: object
+                  description: ''
+                  example: null
+                  properties:
+                    crmProvider:
+                      type: string
+                      description: ''
+                      example: architecto
+                      nullable: true
+                    analyticsProvider:
+                      type: string
+                      description: ''
+                      example: architecto
+                      nullable: true
+                  nullable: true
+                system:
+                  type: object
+                  description: ''
+                  example: null
+                  properties:
+                    maintenanceMode:
+                      type: boolean
+                      description: ''
+                      example: true
+                      nullable: true
+                    backupFrequencyHours:
+                      type: integer
+                      description: 'Must be at least 1. Must not be greater than 168.'
+                      example: 22
+                      nullable: true
+                  nullable: true
+                audit:
+                  type: object
+                  description: ''
+                  example: null
+                  properties:
+                    retentionDays:
+                      type: integer
+                      description: 'Must be at least 30. Must not be greater than 365.'
+                      example: 7
+                      nullable: true
+                    exportEnabled:
+                      type: boolean
+                      description: ''
+                      example: false
+                      nullable: true
+                  nullable: true
+      security: []
